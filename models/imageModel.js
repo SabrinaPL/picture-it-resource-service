@@ -7,11 +7,30 @@
 
 import mongoose from 'mongoose'
 import { BASE_SCHEMA } from './baseSchema.js'
-
+import { timeStamp } from 'console'
 
 // Create a schema.
 const schema = new mongoose.Schema({
-  
+  imageUrl: {
+    type: String, 
+    // verify formatting?
+    required: true,
+  },
+  location: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String, 
+    required: true,
+  },
+  id: {
+    type: String,
+    required: true,
+  },
+},
+{
+  timestamps: true
 })
 
 schema.add(BASE_SCHEMA)
