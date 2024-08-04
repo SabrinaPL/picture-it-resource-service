@@ -7,7 +7,6 @@
 
 import mongoose from 'mongoose'
 import { BASE_SCHEMA } from './baseSchema.js'
-import { timeStamp } from 'console'
 
 // Create a schema.
 const schema = new mongoose.Schema({
@@ -22,10 +21,6 @@ const schema = new mongoose.Schema({
   },
   description: {
     type: String, 
-    required: true,
-  },
-  id: {
-    type: String,
     required: true,
   },
 },

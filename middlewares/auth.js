@@ -65,7 +65,7 @@ export const authenticateJWT = async (req, res, next) => {
       throw new Error('Invalid authentication scheme.')
     }
 
-    req.user = await JsonWebToken.decodeUser(token, process.env.ACCESS_TOKEN_SECRET)
+    req.user = await JsonWebToken.decodeUser(token, process.env.JWT_PUBLIC_KEY)
 
     next()
   } catch (error) {
