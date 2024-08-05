@@ -9,6 +9,13 @@ export class ImageController {
  
   }
 
+  /**
+   * Method to create a new image, store the image data in the resource service and forward the image to the image service.
+   * 
+   * @param {*} req - The request object.
+   * @param {*} res - The response object.
+   * @param {*} next - The next middleware function.
+   */
   async createImage (req, res, next) {
     // Create a new image containing the data from the request body (base64-encoded image data, title, description, user-id).
 
