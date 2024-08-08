@@ -19,28 +19,38 @@ export class ImageController {
   async createImage (req, res, next) {
     // Create a new image containing the data from the request body (base64-encoded image data, title, description, user-id).
 
+    console.log('In createImage')
+
+    // Create an image object to send to the image service.
     const image = {
       data: req.body.data,
       contentType: req.body.contentType,
+      description: req.body.description,
+      location: req.body.location,
     }
+
+    // Testing, remove later.
+    console.log('Image:', image)
+    console.log(process.env.IMAGE_SERVICE_BASE_URL + '/images')
+    console.log('access token:' + process.env.IMAGE_SERVICE_ACCESS_TOKEN)
 
     // Forward the actual image data to the image service.
     const response = await fetch (process.env.IMAGE_SERVICE_BASE_URL + '/images', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': process.env.IMAGE_SERVICE_ACCESS_TOKEN,
+        'X-API-Private-Token': `${process.env.IMAGE_SERVICE_ACCESS_TOKEN}`,
       },
       body: JSON.stringify(image),
     })
+
+    // Retrieve the imageUrl from the response. 
+    const data = await response.json()
 
     if (!response.ok) {
       // Testing, remove later.
       console.log('Error:', response.status, response.statusText)
     } 
-
-    // Retrieve the imageUrl from the response. 
-    const data = await response.json()
 
     const imageUrl = data.imageUrl
 
@@ -56,6 +66,7 @@ export class ImageController {
       const data = await ImageModel.create(imageData)
       res.status(201).json(data)
     } catch (error) {
+      console.log('Error:', error)
       // Error handling.
     }
   }
