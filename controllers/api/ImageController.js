@@ -2,7 +2,21 @@ import { ImageModel } from '../../models/imageModel.js'
 
 export class ImageController {
   async getImages (req, res, next) {
- 
+    // Implement pagination (as recommended by Mats and Johan).
+    const itemsPerPage = 10
+    const currentPage = req.query.page ? parseInt(req.query.page) : 1
+    const skipToNextPage = (currentPage - 1) * itemsPerPage
+
+    // Fetch the items (chaining skip and limit, as suggested by copilot).
+    const images = await ImageModel.find().skip(skipToNextPage).limit(itemsPerPage)
+
+    // How to tell the user how many pages there are? How to get the next page? 
+
+    // Calculate the number of pages needed to display all the images.
+
+    // Retrieve the images from the resource service.
+
+    // Fetch info from the resource service to get the stored images.
   }
 
   async getImage (req, res, next) {
@@ -27,6 +41,7 @@ export class ImageController {
       contentType: req.body.contentType,
       description: req.body.description,
       location: req.body.location,
+      userId: req.body.userId
     }
 
     // Testing, remove later.
@@ -47,9 +62,11 @@ export class ImageController {
     // Retrieve the imageUrl from the response. 
     const data = await response.json()
 
+    console.log(data)
+
     if (!response.ok) {
       // Testing, remove later.
-      console.log('Error:', response.status, response.statusText)
+      console.log('Error')
     } 
 
     const imageUrl = data.imageUrl
