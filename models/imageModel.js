@@ -11,18 +11,18 @@ import { BASE_SCHEMA } from './baseSchema.js'
 // Create a schema.
 const schema = new mongoose.Schema({
   imageUrl: {
-    type: String, 
+    type: String,
     // verify formatting?
-    required: true,
+    required: true
   },
   location: {
     type: String,
-    required: true,
+    required: true
   },
   description: {
-    type: String, 
-    required: true,
-  },
+    type: String,
+    required: true
+  }
   /* userId: {
     type: String,
     required: true,
