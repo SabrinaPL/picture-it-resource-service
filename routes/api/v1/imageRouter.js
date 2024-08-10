@@ -2,6 +2,7 @@
  * @file Defines the image router.
  * @module imageRouter
  * @author Sabrina Prichard-Lybeck <sp223kz@student.lnu.se>
+ * @version 1.0.0
  */
 
 import express from 'express'
@@ -22,4 +23,3 @@ router.get('/:id', imageController.getImage)
 router.put('/:id', imageController.updateImage)
 router.patch('/:id', imageController.partEditImage)
 router.delete('/:id', imageController.deleteImage)
-

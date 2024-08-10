@@ -1,7 +1,7 @@
 /**
  * @file Defines the base schema.
  * @module models/baseSchema
- * @author Mats Loock
+ * @author Mats Loock & Sabrina Prichard-Lybeck <sp223kz@student.lnu.se>
  * @version 3.1.0
  */
 

@@ -10,6 +10,6 @@ import { router as imageRouter } from './imageRouter.js'
 
 export const router = express.Router()
 
+// Add info about the api to the welcome message.
 router.get('/', (req, res) => res.json({ message: 'Hooray! Welcome to version 1 of this very simple RESTful API!' }))
 router.use('/images', imageRouter)
-

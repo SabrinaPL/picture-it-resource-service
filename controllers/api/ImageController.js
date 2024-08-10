@@ -66,10 +66,12 @@ export class ImageController {
     // Sanitize the data in the req.body.
 
     try {
-      const image = await ImageModel.findById(id)
+      const image = await ImageModel.findOne({ id })
+
       if (!image) {
         console.log('No image found in local database')
       }
+
       res.status(200).json(image)
     } catch (error) {
       console.log('Error:', error)
@@ -133,7 +135,7 @@ export class ImageController {
       imageUrl,
       description: req.body.description,
       location: req.body.location,
-      _id: imageId,
+      id: imageId,
       userId
     }
 
@@ -141,7 +143,7 @@ export class ImageController {
 
     try {
       // Store the image data in the resource service.
-      // const data = await ImageModel.create(imageData)
+      const data = await ImageModel.create(imageData)
 
       console.log(data)
 
@@ -223,7 +225,7 @@ export class ImageController {
       }
 
       // Delete the image data from the resource service.
-      ImageModel.findByIdAndDelete({ id })
+      ImageModel.findOneAndDelete({ id })
       res.status(204).end()
     } catch (error) {
       console.log('Error:', error)

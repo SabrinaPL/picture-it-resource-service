@@ -24,15 +24,15 @@ const schema = new mongoose.Schema({
     required: true
   },
   // Added a unique identifier/custom id for the image so that the image data in resource db has the same identifier as the _id auto generated from the image service db (to easily connect the image to its data).
-  _id: {
+  id: {
     type: String,
     required: true,
     unique: true
-  }
-  /* userId: {
+  },
+  userId: {
     type: String,
-    required: true,
-  },*/
+    required: true
+  }
 },
 {
   timestamps: true
