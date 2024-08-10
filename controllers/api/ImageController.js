@@ -1,4 +1,5 @@
 import { ImageModel } from '../../models/imageModel.js'
+import { JsonWebToken } from '../../lib/JsonWebToken.js'
 
 /**
  * Controller for the image resource.
@@ -123,17 +124,17 @@ export class ImageController {
     const imageUrl = data.imageUrl
     const imageId = data.id
 
-    // Fetch userId from the req.header by decoding the JWT (base64).
-
-    console.log('Creating image with ID:', imageId)
+    // Fetch userId from the JWT.
+    const user = await JsonWebToken.decodeUser(req.headers.authorization.split(' ')[1], process.env.JWT_PUBLIC_KEY)
+    const userId = user.id
 
     // Store the info about the image in the resource service.
     const imageData = {
       imageUrl,
       description: req.body.description,
       location: req.body.location,
-      _id: imageId
-      // userId
+      _id: imageId,
+      userId
     }
 
     console.log(imageData)
@@ -266,15 +267,5 @@ export class ImageController {
     } catch (error) {
       console.log('Error:', error)
     }
-  }
-
-  /**
-   * Method to decode the userId from the JWT (base64).
-   *
-   * @param {*} req - The request object.
-   */
-  decodeUserId (req) {
-    // Decode the userId from the JWT.
-
   }
 }
