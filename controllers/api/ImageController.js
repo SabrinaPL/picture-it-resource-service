@@ -225,7 +225,8 @@ export class ImageController {
       }
 
       // Delete the image data from the resource service.
-      ImageModel.findOneAndDelete({ id })
+      await ImageModel.findOneAndDelete({ id })
+
       res.status(204).end()
     } catch (error) {
       console.log('Error:', error)

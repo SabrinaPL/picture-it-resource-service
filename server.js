@@ -33,7 +33,7 @@ try {
   app.use(cors())
 
   // Parse requests of the content type application/json and increase the size limit.
-  app.use(express.json({ limit: "500kb" }))
+  app.use(express.json({ limit: '500kb' }))
 
   // Add the request-scoped context.
   // NOTE! Must be placed before any middle that needs access to the context!
@@ -42,7 +42,7 @@ try {
 
   // Use a morgan logger.
   app.use(morganLogger)
-  
+
   // Middleware to be executed before the routes.
   app.use((req, res, next) => {
     // Add a request UUID to each request and store information about
@@ -65,6 +65,7 @@ try {
   })
 
   // Apply the rate limiting middleware to image routes.
+  app.use('/images', limiter)
 
   // Error handler.
   app.use((err, req, res, next) => {
