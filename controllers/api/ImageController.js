@@ -1,5 +1,7 @@
+import http from 'node:http'
 import { ImageModel } from '../../models/imageModel.js'
 import { JsonWebToken } from '../../lib/JsonWebToken.js'
+import { CUSTOM_STATUS_CODES } from '../../utils/customErrors.js'
 
 /**
  * Controller for the image resource.
@@ -86,10 +88,6 @@ export class ImageController {
    * @param {*} next - The next middleware function.
    */
   async createImage (req, res, next) {
-    // Create a new image containing the data from the request body (base64-encoded image data, title, description, user-id).
-
-    console.log('In createImage')
-
     // Sanitize the data in the req.body.
 
     // Create an image object to send to the image service.
@@ -111,18 +109,11 @@ export class ImageController {
     })
 
     if (!response.ok) {
-      // Testing, remove later.
-      console.log('Error')
-      console.log(response.status)
+      // Error handling.
     }
 
-    // Retrieve the imageUrl from the response.
+    // Retrieve the imageUrl and imageId from the response.
     const data = await response.json()
-
-    console.log('Checking data in response:')
-    console.log(data)
-    console.log(data.id)
-
     const imageUrl = data.imageUrl
     const imageId = data.id
 
@@ -139,18 +130,30 @@ export class ImageController {
       userId
     }
 
-    console.log(imageData)
-
     try {
       // Store the image data in the resource service.
       const data = await ImageModel.create(imageData)
 
-      console.log(data)
+      if (!data) {
+        // Error handling.
+      }
 
-      res.status(201).json(data)
+      res
+        .status(201)
+        .json(data)
     } catch (error) {
-      console.log('Error:', error)
-      // Error handling.
+      // Default to 500 if no status code is provided.
+      let httpStatusCode = 500
+
+      if (error.message === '') {
+
+      }
+
+      const err = new Error(CUSTOM_STATUS_CODES || http.STATUS_CODES[httpStatusCode])
+      err.status = httpStatusCode
+      err.cause = error
+
+      next(err)
     }
   }
 
@@ -167,8 +170,6 @@ export class ImageController {
     // Sanitize the data in the req.body.
 
     // All the info needs to be passed and updated.
-
-    console.log(process.env.IMAGE_SERVICE_BASE_URL + '/images/' + id)
 
     try {
       // Send a request to the image service to update the image.
