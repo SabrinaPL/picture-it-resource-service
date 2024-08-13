@@ -10,5 +10,6 @@ import { router as imageRouter } from './imageRouter.js'
 
 export const router = express.Router()
 
-router.get('/', (req, res) => res.json({ message: 'Welcome to version 1 of the Resource API\n\nTo get data of stored images, use the "/images" and "images/{id}" endpoints with a GET-request\nTo create a new image make a POST-request to the "/images" endpoint.\nTo edit or partially edit an image make a PUT or PATCH-request to the "images/{id}" endpoint and to delete an image make a DELETE-request to the same endpoint.' }))
+router.get('/', (req, res) => res.json({ message: 'Welcome to version 1 of the Resource API. Use the "/images" endpoint to get data of stored images with a GET-request or create new images with a POST-request. Use the "/images/{id}" endpoint to get data of a specific image with GET, edit an image with PUT or PATCH and delete an image with DELETE. When fetching images information about current page, amount of pages and nextUrl is also returned for pagination. To gain access to the Resource service register as a user and login via the "https://cscloud7-49.lnu.se/picture-it/api/v1/auth/" "/register" and "/login" endpoints.' }))
+
 router.use('/images', imageRouter)
