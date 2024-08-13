@@ -37,27 +37,25 @@ export class ImageController {
         .skip(skipToNextPage)
         .limit(itemsPerPage)
 
-      // Use the following to combine into new url to send in res.
-      console.log(req.protocol, req.hostname, req.baseUrl)
-
-      if (!images) {
-        return res
-          .status(500)
-          .json({ status_code: 500, message: CUSTOM_STATUS_CODES[500] })
-      }
-
       res
         .status(200)
         .json({
           images,
           currentPage,
           numberOfPages,
-          // The next url is added in the response to make it easier to   navigate to the next page from the client side.
+          // The next url is added in the response to make it easier to navigate to the next page from the client side.
           // Logic to check if the next page is the last page and adjust the  url accordingly (as suggested by copilot).
-          nextUrl: `${req.protocol}/images?page=${currentPage + 1 > numberOfPages ? null : currentPage + 1}`
+          nextUrl: currentPage === numberOfPages ? null : `${req.protocol}://${req.get('host')}${req.baseUrl}?page=${currentPage + 1}`
         })
     } catch (error) {
-      console.log('Error:', error)
+      // Default to 500 if no status code is provided.
+      const httpStatusCode = 500
+
+      const err = new Error(CUSTOM_STATUS_CODES[httpStatusCode] || http.STATUS_CODES[httpStatusCode])
+      err.status = httpStatusCode
+      err.cause = error
+
+      next(err)
     }
   }
 
@@ -75,14 +73,25 @@ export class ImageController {
       const image = await ImageModel.findOne({ id })
 
       if (!image) {
-        console.log('No image found in local database')
+        throw new Error('404')
       }
 
       res
         .status(200)
         .json(image)
     } catch (error) {
-      console.log('Error:', error)
+      // Default to 500 if no status code is provided.
+      let httpStatusCode = 500
+
+      if (error.message === '404') {
+        httpStatusCode = 404
+      }
+
+      const err = new Error(CUSTOM_STATUS_CODES[httpStatusCode] || http.STATUS_CODES[httpStatusCode])
+      err.status = httpStatusCode
+      err.cause = error
+
+      next(err)
     }
   }
 
@@ -103,11 +112,11 @@ export class ImageController {
       req.body.data = sanitizeHtml(req.body.data)
 
       // Format base64 image data:
-      // I want to remove the 'data:image/{contentType};base64' from the string.
+      const imageString = req.body.data.split(';base64').pop()
 
       // Create an image object to send to the image service.
       const image = {
-        data: req.body.data,
+        data: imageString,
         contentType: req.body.contentType,
         description: req.body.description,
         location: req.body.location
@@ -124,11 +133,7 @@ export class ImageController {
       })
 
       if (!response.ok) {
-        if (response.status === 400) {
-          throw new Error('Bad Request')
-        } else if (response.status === 401) {
-          throw new Error('Unauthorized')
-        }
+        throw new Error(`${response.status}`)
       }
 
       // Retrieve the imageUrl and imageId from the response.
@@ -150,11 +155,7 @@ export class ImageController {
       }
 
       // Store the image data in the resource service.
-      const dataResource = await ImageModel.create(imageData)
-
-      if (!dataResource) {
-        // Error handling.
-      }
+      await ImageModel.create(imageData)
 
       res
         .status(201)
@@ -163,9 +164,9 @@ export class ImageController {
       // Default to 500 if no status code is provided.
       let httpStatusCode = 500
 
-      if (error.message === 'Bad Request') {
+      if (error.message === '400') {
         httpStatusCode = 400
-      } else if (error.message === 'Unauthorized') {
+      } else if (error.message === '401') {
         httpStatusCode = 401
       }
 
@@ -190,9 +191,7 @@ export class ImageController {
       const id = req.params.id
 
       if (!req.body.description || !req.body.data || !req.body.location || !req.body.contentType) {
-        return res
-          .status(400)
-          .json({ status_code: 400, message: CUSTOM_STATUS_CODES[400] })
+        throw new Error('400')
       }
 
       // Sanitize the data in the req.body.
@@ -212,17 +211,38 @@ export class ImageController {
       })
 
       if (!response.ok) {
-        // Error handling.
+        throw new Error(`${response.status}`)
       }
 
       // Update the image data in the resource service.
       const image = await ImageModel.findOneAndUpdate({ id }, req.body, { new: true })
 
+      if (!image) {
+        throw new Error('404')
+      }
+
       res
-        .status(200)
-        .json(image)
+        .status(204)
+        .end()
     } catch (error) {
-      console.log('Error:', error)
+      // Default to 500 if no status code is provided.
+      let httpStatusCode = 500
+
+      if (error.message === '400') {
+        httpStatusCode = 400
+      } else if (error.message === '401') {
+        httpStatusCode = 401
+      } else if (error.message === '403') {
+        httpStatusCode = 403
+      } else if (error.message === '404') {
+        httpStatusCode = 404
+      }
+
+      const err = new Error(CUSTOM_STATUS_CODES[httpStatusCode] || http.STATUS_CODES[httpStatusCode])
+      err.status = httpStatusCode
+      err.cause = error
+
+      next(err)
     }
   }
 
@@ -232,6 +252,7 @@ export class ImageController {
    * @param {*} req - The request object.
    * @param {*} res - The response object.
    * @param {*} next - The next middleware function.
+   * @returns {*} - Status code and message.
    */
   async deleteImage (req, res, next) {
     try {
@@ -246,17 +267,37 @@ export class ImageController {
       })
 
       if (!response.ok) {
-        // Error handling.
+        throw new Error(`${response.status}`)
       }
 
       // Delete the image data from the resource service.
-      await ImageModel.findOneAndDelete({ id })
+      // Error handle if image can't be found in resource db.
+      const image = await ImageModel.findOneAndDelete({ id })
+
+      if (!image) {
+        throw new Error('404')
+      }
 
       res
         .status(204)
         .end()
     } catch (error) {
-      // Error handling.
+      // Default to 500 if no status code is provided.
+      let httpStatusCode = 500
+
+      if (error.message === '401') {
+        httpStatusCode = 401
+      } else if (error.message === '403') {
+        httpStatusCode = 403
+      } else if (error.message === '404') {
+        httpStatusCode = 404
+      }
+
+      const err = new Error(CUSTOM_STATUS_CODES[httpStatusCode] || http.STATUS_CODES[httpStatusCode])
+      err.status = httpStatusCode
+      err.cause = error
+
+      next(err)
     }
   }
 
@@ -274,13 +315,13 @@ export class ImageController {
       // Sanitize the data in the req.body.
       if (req.body.description) {
         req.body.description = sanitizeHtml(req.body.description)
-      } 
+      }
       if (req.body.data) {
         req.body.data = sanitizeHtml(req.body.data)
-      } 
+      }
       if (req.body.location) {
-        req.body.location = sanitizeHtml(req.body. location)
-      } 
+        req.body.location = sanitizeHtml(req.body.location)
+      }
       if (req.body.contentType) {
         req.body.contentType = sanitizeHtml(req.body.contentType)
       }
@@ -296,21 +337,38 @@ export class ImageController {
       })
 
       if (!response.ok) {
-        // Error handling.
+        throw new Error(`${response.status}`)
       }
 
       // Update the image data in the resource service.
       const image = await ImageModel.findOneAndUpdate({ id }, req.body, { new: true })
 
       if (!image) {
-        // Error handling.
+        throw new Error('404')
       }
 
       res
         .status(200)
         .json(image)
     } catch (error) {
-      // Error handling.
+      // Default to 500 if no status code is provided.
+      let httpStatusCode = 500
+
+      if (error.message === '400') {
+        httpStatusCode = 400
+      } else if (error.message === '401') {
+        httpStatusCode = 401
+      } else if (error.message === '403') {
+        httpStatusCode = 403
+      } else if (error.message === '404') {
+        httpStatusCode = 404
+      }
+
+      const err = new Error(CUSTOM_STATUS_CODES[httpStatusCode] || http.STATUS_CODES[httpStatusCode])
+      err.status = httpStatusCode
+      err.cause = error
+
+      next(err)
     }
   }
 }
