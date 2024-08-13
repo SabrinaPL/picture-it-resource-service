@@ -271,7 +271,6 @@ export class ImageController {
       }
 
       // Delete the image data from the resource service.
-      // Error handle if image can't be found in resource db.
       const image = await ImageModel.findOneAndDelete({ id })
 
       if (!image) {

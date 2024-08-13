@@ -2,7 +2,7 @@
   "name": "resource-service",
   "version": "1.0.0",
   "description": "The Resource Service is a RESTful API responsible for managing resources in the system. It should follow the API documentation provided at the following link: [https://courselab.lnu.se/picture-it/api/v1/docs/]. While it is possible to extend the API, the endpoints described in the documentation must still work and provide at least the data specified.",
-  "main": "index.js",
+  "main": "./src/server.js",
   "directories": {
     "lib": "lib"
   },
