@@ -6,9 +6,6 @@
  */
 
 export const CUSTOM_STATUS_CODES = {
-  200: 'Successful operation.',
-  201: 'The request has been fulfilled, resulting in the creation of a new image.',
-  204: 'The server successfully processed the request and is not returning any content.',
   400: 'The request cannot or will not be processed due to something that is perceived to be a client error (for example,validation error).',
   401: 'Access token invalid or not provided.',
   403: 'The request contained valid data and was understood by the server, but the server is refusing action due to the authenticated user not having the necessary permissions for the resource.',

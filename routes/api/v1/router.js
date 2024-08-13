@@ -10,6 +10,5 @@ import { router as imageRouter } from './imageRouter.js'
 
 export const router = express.Router()
 
-// Add info about the api to the welcome message.
-router.get('/', (req, res) => res.json({ message: 'Hooray! Welcome to version 1 of this very simple RESTful API!' }))
+router.get('/', (req, res) => res.json({ message: 'Welcome to version 1 of the Resource API\n\nTo get data of stored images, use the "/images" and "images/{id}" endpoints with a GET-request\nTo create a new image make a POST-request to the "/images" endpoint.\nTo edit or partially edit an image make a PUT or PATCH-request to the "images/{id}" endpoint and to delete an image make a DELETE-request to the same endpoint.' }))
 router.use('/images', imageRouter)
