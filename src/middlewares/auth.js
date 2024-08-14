@@ -7,6 +7,7 @@
 
 import http from 'node:http'
 import { JsonWebToken } from '../lib/JsonWebToken.js'
+import { CUSTOM_STATUS_CODES } from '../utils/customErrors.js'
 
 /**
  * Permission levels.
@@ -71,7 +72,7 @@ export const authenticateJWT = async (req, res, next) => {
   } catch (error) {
     // Authentication failed.
     const statusCode = 401
-    const err = new Error(http.STATUS_CODES[statusCode])
+    const err = new Error(CUSTOM_STATUS_CODES[statusCode] || http.STATUS_CODES[statusCode])
     err.status = statusCode
     err.cause = error
 
